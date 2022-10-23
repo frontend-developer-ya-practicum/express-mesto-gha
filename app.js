@@ -1,4 +1,5 @@
 const express = require('express');
+const { StatusCodes } = require('http-status-codes');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
@@ -23,5 +24,10 @@ app.use((req, res, next) => {
 
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
+
+// handle unmatched routes
+app.use((req, res) => {
+  res.status(StatusCodes.NOT_FOUND).send({ message: 'Некорректный путь' });
+});
 
 app.listen(PORT);
