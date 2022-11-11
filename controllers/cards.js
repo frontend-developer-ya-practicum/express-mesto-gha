@@ -1,5 +1,5 @@
-const { StatusCodes } = require('http-status-codes');
 const mongoose = require('mongoose');
+const HttpCodes = require('../constants/http-status-codes');
 const Card = require('../models/cards');
 
 module.exports.getCards = (req, res) => {
@@ -7,7 +7,7 @@ module.exports.getCards = (req, res) => {
     .then((cards) => res.send(cards))
     .catch(() => {
       res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .status(HttpCodes.INTERNAL_SERVER_ERROR)
         .send({ message: 'Внутренняя ошибка сервера' });
     });
 };
@@ -20,14 +20,14 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(StatusCodes.BAD_REQUEST).send({
+        res.status(HttpCodes.BAD_REQUEST).send({
           message: 'Переданы некорректные данные при создании карточки',
         });
         return;
       }
 
       res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .status(HttpCodes.INTERNAL_SERVER_ERROR)
         .send({ message: 'Внутренняя ошибка сервера' });
     });
 };
@@ -37,7 +37,7 @@ module.exports.deleteCard = (req, res) => {
     .then((card) => {
       if (!card) {
         res
-          .status(StatusCodes.NOT_FOUND)
+          .status(HttpCodes.NOT_FOUND)
           .send({ message: 'Карточка с указанным _id не найдена' });
         return;
       }
@@ -46,13 +46,13 @@ module.exports.deleteCard = (req, res) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
         res
-          .status(StatusCodes.BAD_REQUEST)
+          .status(HttpCodes.BAD_REQUEST)
           .send({ message: 'Указан некорректный _id при удалении карточки' });
         return;
       }
 
       res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .status(HttpCodes.INTERNAL_SERVER_ERROR)
         .send({ message: 'Внутренняя ошибка сервера' });
     });
 };
@@ -65,7 +65,7 @@ module.exports.likeCard = (req, res) => {
     .then((card) => {
       if (!card) {
         res
-          .status(StatusCodes.NOT_FOUND)
+          .status(HttpCodes.NOT_FOUND)
           .send({ message: 'Передан несуществующий _id карточки' });
         return;
       }
@@ -74,20 +74,20 @@ module.exports.likeCard = (req, res) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
         res
-          .status(StatusCodes.BAD_REQUEST)
+          .status(HttpCodes.BAD_REQUEST)
           .send({ message: 'Указан некорректный _id карточки' });
         return;
       }
 
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(StatusCodes.BAD_REQUEST).send({
+        res.status(HttpCodes.BAD_REQUEST).send({
           message: 'Переданы некорректные данные для постановки лайка',
         });
         return;
       }
 
       res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .status(HttpCodes.INTERNAL_SERVER_ERROR)
         .send({ message: 'Внутренняя ошибка сервера' });
     });
 };
@@ -100,7 +100,7 @@ module.exports.dislikeCard = (req, res) => {
     .then((card) => {
       if (!card) {
         res
-          .status(StatusCodes.NOT_FOUND)
+          .status(HttpCodes.NOT_FOUND)
           .send({ message: 'Передан несуществующий _id карточки' });
         return;
       }
@@ -109,20 +109,20 @@ module.exports.dislikeCard = (req, res) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
         res
-          .status(StatusCodes.BAD_REQUEST)
+          .status(HttpCodes.BAD_REQUEST)
           .send({ message: 'Указан некорректный _id карточки' });
         return;
       }
 
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(StatusCodes.BAD_REQUEST).send({
+        res.status(HttpCodes.BAD_REQUEST).send({
           message: 'Переданы некорректные данные для снятия лайка',
         });
         return;
       }
 
       res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .status(HttpCodes.INTERNAL_SERVER_ERROR)
         .send({ message: 'Внутренняя ошибка сервера' });
     });
 };

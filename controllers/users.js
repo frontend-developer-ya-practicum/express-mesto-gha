@@ -1,5 +1,5 @@
-const { StatusCodes } = require('http-status-codes');
 const mongoose = require('mongoose');
+const HttpCodes = require('../constants/http-status-codes');
 const User = require('../models/users');
 
 module.exports.getUsers = (req, res) => {
@@ -7,7 +7,7 @@ module.exports.getUsers = (req, res) => {
     .then((users) => res.send(users))
     .catch(() => {
       res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .status(HttpCodes.INTERNAL_SERVER_ERROR)
         .send({ message: 'Внутренняя ошибка сервера' });
     });
 };
@@ -17,7 +17,7 @@ module.exports.getUser = (req, res) => {
     .then((user) => {
       if (!user) {
         res
-          .status(StatusCodes.NOT_FOUND)
+          .status(HttpCodes.NOT_FOUND)
           .send({ message: 'Пользователь с указанным _id не найден' });
         return;
       }
@@ -26,13 +26,13 @@ module.exports.getUser = (req, res) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
         res
-          .status(StatusCodes.BAD_REQUEST)
+          .status(HttpCodes.BAD_REQUEST)
           .send({ message: 'Указан некорректный _id пользователя' });
         return;
       }
 
       res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .status(HttpCodes.INTERNAL_SERVER_ERROR)
         .send({ message: 'Внутренняя ошибка сервера' });
     });
 };
@@ -44,14 +44,14 @@ module.exports.createUser = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(StatusCodes.BAD_REQUEST).send({
+        res.status(HttpCodes.BAD_REQUEST).send({
           message: 'Переданы некорректные данные при создании пользователя',
         });
         return;
       }
 
       res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .status(HttpCodes.INTERNAL_SERVER_ERROR)
         .send({ message: 'Внутренняя ошибка сервера' });
     });
 };
@@ -64,7 +64,7 @@ module.exports.updateUserInfo = (req, res) => {
     .then((user) => {
       if (!user) {
         res
-          .status(StatusCodes.NOT_FOUND)
+          .status(HttpCodes.NOT_FOUND)
           .send({ message: 'Пользователь с указанным _id не найден' });
         return;
       }
@@ -72,14 +72,14 @@ module.exports.updateUserInfo = (req, res) => {
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(StatusCodes.BAD_REQUEST).send({
+        res.status(HttpCodes.BAD_REQUEST).send({
           message: 'Переданы некорректные данные при обновлении профиля',
         });
         return;
       }
 
       res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .status(HttpCodes.INTERNAL_SERVER_ERROR)
         .send({ message: 'Внутренняя ошибка сервера' });
     });
 };
@@ -92,7 +92,7 @@ module.exports.updateUserAvatar = (req, res) => {
     .then((user) => {
       if (!user) {
         res
-          .status(StatusCodes.NOT_FOUND)
+          .status(HttpCodes.NOT_FOUND)
           .send({ message: 'Пользователь с указанным id не найден' });
         return;
       }
@@ -100,14 +100,14 @@ module.exports.updateUserAvatar = (req, res) => {
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(StatusCodes.BAD_REQUEST).send({
+        res.status(HttpCodes.BAD_REQUEST).send({
           message: 'Переданы некорректные данные при обновлении аватара',
         });
         return;
       }
 
       res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .status(HttpCodes.INTERNAL_SERVER_ERROR)
         .send({ message: 'Внутренняя ошибка сервера' });
     });
 };
