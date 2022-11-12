@@ -5,6 +5,7 @@ const User = require('../models/users');
 const NotFoundError = require('../errors/not-found');
 const BadRequestError = require('../errors/bad-request');
 const UnauthorizedError = require('../errors/unauthorized');
+const ConflictError = require('../errors/conflict');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -63,6 +64,10 @@ module.exports.createUser = (req, res, next) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         next(new BadRequestError(err.message));
+        return;
+      }
+      if (err.code === 11000) {
+        next(new ConflictError('User with given email already exists'));
         return;
       }
       next(err);
