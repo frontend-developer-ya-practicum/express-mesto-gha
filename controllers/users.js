@@ -1,8 +1,10 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/users');
 const NotFoundError = require('../errors/not-found');
 const BadRequestError = require('../errors/bad-request');
+const UnauthorizedError = require('../errors/unauthorized');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -20,6 +22,29 @@ module.exports.getUser = (req, res, next) => {
         return;
       }
       next(err);
+    });
+};
+
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        'todo-replace-with-env',
+        { expiresIn: '7d' },
+      );
+
+      res
+        .cookie('jwt', token, {
+          maxAge: 3600000,
+          httpOnly: true,
+        })
+        .end();
+    })
+    .catch((err) => {
+      next(new UnauthorizedError(err.message));
     });
 };
 
