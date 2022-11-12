@@ -1,18 +1,15 @@
 const mongoose = require('mongoose');
-const HttpCodes = require('../constants/http-status-codes');
 const Card = require('../models/cards');
+const NotFoundError = require('../errors/not-found');
+const BadRequestError = require('../errors/bad-request');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.send(cards))
-    .catch(() => {
-      res
-        .status(HttpCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: 'Внутренняя ошибка сервера' });
-    });
+    .catch(next);
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   const ownerId = req.user._id;
 
@@ -20,109 +17,62 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(HttpCodes.BAD_REQUEST).send({
-          message: 'Переданы некорректные данные при создании карточки',
-        });
+        next(new BadRequestError(err.message));
         return;
       }
-
-      res
-        .status(HttpCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: 'Внутренняя ошибка сервера' });
+      next(err);
     });
 };
 
-module.exports.deleteCard = (req, res) => {
+module.exports.deleteCard = (req, res, next) => {
   Card.findByIdAndRemove(req.params.id)
-    .then((card) => {
-      if (!card) {
-        res
-          .status(HttpCodes.NOT_FOUND)
-          .send({ message: 'Карточка с указанным _id не найдена' });
-        return;
-      }
-      res.send(card);
-    })
+    .orFail(new NotFoundError('Card with specified id not found'))
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        res
-          .status(HttpCodes.BAD_REQUEST)
-          .send({ message: 'Указан некорректный _id при удалении карточки' });
+        next(new BadRequestError('Invalid card id'));
         return;
       }
-
-      res
-        .status(HttpCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: 'Внутренняя ошибка сервера' });
+      next(err);
     });
 };
 
-module.exports.likeCard = (req, res) => {
-  const updateQuery = { $addToSet: { likes: req.user._id } };
+module.exports.likeCard = (req, res, next) => {
+  const update = { $addToSet: { likes: req.user._id } };
   const options = { new: true, runValidators: true };
 
-  Card.findByIdAndUpdate(req.params.cardId, updateQuery, options)
-    .then((card) => {
-      if (!card) {
-        res
-          .status(HttpCodes.NOT_FOUND)
-          .send({ message: 'Передан несуществующий _id карточки' });
-        return;
-      }
-      res.send(card);
-    })
+  Card.findByIdAndUpdate(req.params.cardId, update, options)
+    .orFail(new NotFoundError('Card with specified id not found'))
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        res
-          .status(HttpCodes.BAD_REQUEST)
-          .send({ message: 'Указан некорректный _id карточки' });
+        next(new BadRequestError('Invalid card id'));
         return;
       }
-
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(HttpCodes.BAD_REQUEST).send({
-          message: 'Переданы некорректные данные для постановки лайка',
-        });
+        next(new BadRequestError(err.message));
         return;
       }
-
-      res
-        .status(HttpCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: 'Внутренняя ошибка сервера' });
+      next(err);
     });
 };
 
-module.exports.dislikeCard = (req, res) => {
-  const updateQuery = { $pull: { likes: req.user._id } };
+module.exports.dislikeCard = (req, res, next) => {
+  const update = { $pull: { likes: req.user._id } };
   const options = { new: true, runValidators: true };
 
-  Card.findByIdAndUpdate(req.params.cardId, updateQuery, options)
-    .then((card) => {
-      if (!card) {
-        res
-          .status(HttpCodes.NOT_FOUND)
-          .send({ message: 'Передан несуществующий _id карточки' });
-        return;
-      }
-      res.send(card);
-    })
+  Card.findByIdAndUpdate(req.params.cardId, update, options)
+    .orFail(new NotFoundError('Card with specified id not found'))
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        res
-          .status(HttpCodes.BAD_REQUEST)
-          .send({ message: 'Указан некорректный _id карточки' });
+        next(new BadRequestError('Invalid card id'));
         return;
       }
-
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(HttpCodes.BAD_REQUEST).send({
-          message: 'Переданы некорректные данные для снятия лайка',
-        });
+        next(new BadRequestError(err.message));
         return;
       }
-
-      res
-        .status(HttpCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: 'Внутренняя ошибка сервера' });
+      next(err);
     });
 };

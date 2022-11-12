@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const HttpStatus = require('./constants/http-status-codes');
+const NotFoundError = require('./errors/not-found');
+const { errorHandler } = require('./middlewares/error-handling');
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
@@ -25,8 +26,10 @@ app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
 // handle unmatched routes
-app.use((req, res) => {
-  res.status(HttpStatus.NOT_FOUND).send({ message: 'Некорректный путь' });
+app.use(() => {
+  throw new NotFoundError('Page not found');
 });
+
+app.use(errorHandler);
 
 app.listen(PORT);
