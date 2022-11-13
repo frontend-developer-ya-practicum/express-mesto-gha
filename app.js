@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
+const { errors } = require('celebrate');
 const NotFoundError = require('./errors/not-found');
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -27,6 +28,7 @@ app.use(() => {
   throw new NotFoundError('Page not found');
 });
 
+app.use(errors());
 app.use(require('./middlewares/error-handling'));
 
 app.listen(PORT);
