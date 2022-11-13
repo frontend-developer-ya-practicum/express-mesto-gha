@@ -1,8 +1,10 @@
+const HttpCodes = require('../constants/http-status-codes');
+
 class NotFoundError extends Error {
   constructor(message) {
     super(message);
     this.name = 'NotFoundError';
-    this.statusCode = 404;
+    this.statusCode = HttpCodes.NOT_FOUND;
   }
 }
 

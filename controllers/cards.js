@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Card = require('../models/cards');
+const HttpCodes = require('../constants/http-status-codes');
 const NotFoundError = require('../errors/not-found');
 const BadRequestError = require('../errors/bad-request');
 const ForbiddenError = require('../errors/forbidden');
@@ -15,7 +16,7 @@ module.exports.createCard = (req, res, next) => {
   const ownerId = req.user._id;
 
   Card.create({ name, link, owner: ownerId })
-    .then((card) => res.send(card))
+    .then((card) => res.status(HttpCodes.CREATED).send(card))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         next(new BadRequestError(err.message));
@@ -32,7 +33,8 @@ module.exports.deleteCard = (req, res, next) => {
       if (!card.owner.equals(req.user._id)) {
         return next(new ForbiddenError('Not enough permissions'));
       }
-      return card.remove().then(() => res.status(204).end());
+      return card.remove()
+        .then(() => res.status(HttpCodes.NO_CONTENT).end());
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {

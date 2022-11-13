@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const User = require('../models/users');
+const HttpCodes = require('../constants/http-status-codes');
 const UnauthorizedError = require('../errors/unauthorized');
 const ConflictError = require('../errors/conflict');
 const BadRequestError = require('../errors/bad-request');
@@ -43,7 +44,7 @@ module.exports.register = (req, res, next) => {
         password: hash,
       });
     })
-    .then((user) => res.status(201).send(user))
+    .then((user) => res.status(HttpCodes.CREATED).send(user))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         next(new BadRequestError(err.message));
