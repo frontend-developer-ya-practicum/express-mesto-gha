@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
 const NotFoundError = require('./errors/not-found');
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -12,6 +13,7 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.use('', require('./routes/auth'));
 
