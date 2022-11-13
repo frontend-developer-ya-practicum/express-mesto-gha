@@ -11,16 +11,16 @@ const { PORT = 3000 } = process.env;
 
 const app = express();
 
+const { register, login } = require('./controllers/auth');
+const auth = require('./middlewares/auth');
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '6354b9d2171eeaa9b2157287',
-  };
+app.post('/signup', register);
+app.post('/signin', login);
 
-  next();
-});
+app.use(auth);
 
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
