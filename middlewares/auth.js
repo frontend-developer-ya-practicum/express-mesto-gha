@@ -11,7 +11,7 @@ module.exports = (req, res, next) => {
   try {
     req.user = jwt.verify(token, 'todo-replace-with-env');
   } catch (err) {
-    throw new UnauthorizedError('Authorization required');
+    next(new UnauthorizedError('Authorization required'));
   }
 
   next();
