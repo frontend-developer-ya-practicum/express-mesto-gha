@@ -21,7 +21,7 @@ module.exports.login = (req, res, next) => {
           maxAge: 3600000,
           httpOnly: true,
         })
-        .end();
+        .send({});
     })
     .catch((err) => {
       next(new UnauthorizedError(err.message));
