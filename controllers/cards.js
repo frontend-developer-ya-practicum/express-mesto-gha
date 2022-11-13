@@ -33,8 +33,7 @@ module.exports.deleteCard = (req, res, next) => {
       if (!card.owner.equals(req.user._id)) {
         return next(new ForbiddenError('Not enough permissions'));
       }
-      return card.remove()
-        .then(() => res.status(HttpCodes.NO_CONTENT).send({}));
+      return card.remove().then((cardDeleted) => res.send(cardDeleted));
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
