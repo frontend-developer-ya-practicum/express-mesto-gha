@@ -22,6 +22,19 @@ module.exports.getUser = (req, res, next) => {
     });
 };
 
+module.exports.getCurrentUser = (req, res, next) => {
+  User.findById(req.user._id)
+    .orFail(new NotFoundError('User with specified id not found'))
+    .then((user) => res.send(user))
+    .catch((err) => {
+      if (err instanceof mongoose.Error.CastError) {
+        next(new BadRequestError('Invalid user id'));
+        return;
+      }
+      next(err);
+    });
+};
+
 module.exports.updateUserInfo = (req, res, next) => {
   const { name, about } = req.body;
   const options = { new: true, runValidators: true };
