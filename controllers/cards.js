@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Card = require('../models/cards');
 const NotFoundError = require('../errors/not-found');
 const BadRequestError = require('../errors/bad-request');
+const ForbiddenError = require('../errors/forbidden');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
@@ -27,7 +28,12 @@ module.exports.createCard = (req, res, next) => {
 module.exports.deleteCard = (req, res, next) => {
   Card.findByIdAndRemove(req.params.id)
     .orFail(new NotFoundError('Card with specified id not found'))
-    .then((card) => res.send(card))
+    .then((card) => {
+      if (!card.owner.equals(req.user._id)) {
+        return next(new ForbiddenError('Not enough permissions'));
+      }
+      return card.remove().then(() => res.status(204).end());
+    })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
         next(new BadRequestError('Invalid card id'));
