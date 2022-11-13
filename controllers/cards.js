@@ -27,14 +27,14 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findByIdAndRemove(req.params.id)
+  Card.findByIdAndRemove(req.params.cardId)
     .orFail(new NotFoundError('Card with specified id not found'))
     .then((card) => {
       if (!card.owner.equals(req.user._id)) {
         return next(new ForbiddenError('Not enough permissions'));
       }
       return card.remove()
-        .then(() => res.status(HttpCodes.NO_CONTENT).end());
+        .then(() => res.status(HttpCodes.NO_CONTENT).send({}));
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
