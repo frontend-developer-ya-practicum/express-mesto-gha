@@ -35,25 +35,25 @@ module.exports.register = (req, res, next) => {
 
   bcrypt
     .hash(password, 10)
-    .then((hash) => {
-      User.create({
-        name,
-        about,
-        avatar,
-        email,
-        password: hash,
-      });
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
+    .then((userCreated) => {
+      const user = userCreated.toObject();
+      delete user.password;
+      res.status(HttpCodes.CREATED).send(user);
     })
-    .then((user) => res.status(HttpCodes.CREATED).send(user))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         next(new BadRequestError(err.message));
-        return;
-      }
-      if (err.code === 11000) {
+      } else if (err.code === 11000) {
         next(new ConflictError('User with given email already exists'));
-        return;
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
