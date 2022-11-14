@@ -31,10 +31,11 @@ module.exports.deleteCard = (req, res, next) => {
     .orFail(new NotFoundError('Card with specified id not found'))
     .then((card) => {
       if (!card.owner.equals(req.user._id)) {
-        return next(new ForbiddenError('Not enough permissions'));
+        throw new ForbiddenError('Not enough permissions');
       }
-      return card.remove().then((cardDeleted) => res.send(cardDeleted));
+      return card.remove();
     })
+    .then((cardDeleted) => res.send(cardDeleted))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
         next(new BadRequestError('Invalid card id'));
