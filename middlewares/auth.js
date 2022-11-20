@@ -1,3 +1,4 @@
+const { NODE_ENV, JWT_SECRET } = process.env;
 const jwt = require('jsonwebtoken');
 const UnauthorizedError = require('../errors/unauthorized');
 
@@ -9,7 +10,10 @@ module.exports = (req, res, next) => {
   }
 
   try {
-    req.user = jwt.verify(token, 'todo-replace-with-env');
+    req.user = jwt.verify(
+      token,
+      NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+    );
   } catch (err) {
     next(new UnauthorizedError('Authorization required'));
   }
