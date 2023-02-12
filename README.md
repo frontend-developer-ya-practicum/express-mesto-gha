@@ -17,4 +17,4 @@
 
 ## Ссылка на проект для ревьюеров
 
-Проект [тут](https://github.com/hikjik/express-mesto-gha)
+Проект [тут](https://github.com/frontend-developer-ya-practicum/express-mesto-gha)
